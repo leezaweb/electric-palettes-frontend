@@ -3,10 +3,7 @@ import { Label, Icon } from "semantic-ui-react";
 
 export default class DeviceFilter extends React.Component {
   render() {
-    let colors = this.props.colors.filter(color => {
-      let bool = color.devices ? color.devices.length : 0;
-      return bool;
-    });
+    let colors = this.props.colors.filter(color => color.devices.length);
     return (
       <div className="deviceFilter">
         <Label.Group onClick={this.props.handleType}>

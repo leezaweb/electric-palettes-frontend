@@ -7,45 +7,43 @@ export default class DeviceCard extends React.Component {
       colors,
       decade,
       device_type,
-      id,
       images,
-      palette,
       title_raw
     } = this.props.device;
 
-    const handleClick = e => {
-      let id = e.target.dataset.id;
-
-      fetch(`http://localhost:3000/api/v1/devices/${id}`, {
-        body: JSON.stringify(id),
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        },
-        method: "DELETE"
-      }).then(resp => console.log(resp));
-    };
+    // const handleClick = e => {
+    //   let id = e.target.dataset.id;
+    //
+    //   fetch(`http://localhost:3000/api/v1/devices/${id}`, {
+    //     body: JSON.stringify(id),
+    //     headers: {
+    //       Accept: "application/json",
+    //       "Content-Type": "application/json"
+    //     },
+    //     method: "DELETE"
+    //   }).then(resp => console.log(resp));
+    // };
 
     let image = images.find(image => image.primary === true);
 
-    let card;
-    const addFlip = e => {
-      // card = e.target.closest(".device-card");
-      // card.classList.add("animated", "infinite", "flipInY");
-      // removeFlip();
-    };
+    // let card;
 
-    const removeFlip = () => {
-      setTimeout(
-        () => card.classList.remove("animated", "infinite", "flipInY"),
-        1000
-      );
-    };
+    // const addFlip = e => {
+    //   // card = e.target.closest(".device-card");
+    //   // card.classList.add("animated", "infinite", "flipInY");
+    //   // removeFlip();
+    // };
+
+    // const removeFlip = () => {
+    //   setTimeout(
+    //     () => card.classList.remove("animated", "infinite", "flipInY"),
+    //     1000
+    //   );
+    // };
     return (
       <div
         className="device-card"
         onClick={this.props.clickCard}
-        onMouseOver={addFlip}
         style={{
           backgroundColor: "rgba(255, 255, 255, .1)",
           color: "white",

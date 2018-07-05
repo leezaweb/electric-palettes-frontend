@@ -7,55 +7,69 @@ import DeviceMenu from "./components/DeviceMenu";
 import ColorChart from "./components/ColorChart";
 import "./App.css";
 import { Grid } from "semantic-ui-react";
-import { TransitionGroup, CSSTransition } from "react-transition-group";
-import createHistory from "history/createBrowserHistory";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 
 class App extends React.Component {
   constructor() {
     super();
     this.state = {
-      detail: false,
-      devices: [],
-      filteredDevices: [],
-      colors: [],
       deviceColors: null,
       activeItem: null,
-      decade: "",
+      detail: false,
+      loading: false,
+      filtered: false,
+      devices: [],
+      filteredDevices: [],
       selectedColors: [],
-      type: ""
+      colors: [],
+      decade: "",
+      type: "",
+      page: 1
     };
     this.selectedColors = this.state.colors;
   }
 
   componentDidMount() {
-    fetch("http://localhost:3000/api/v1/devices")
+    fetch("http://localhost:3001/api/v1/devices")
       .then(resp => resp.json())
-      .then(json =>
+      .then(json => {
         this.setState({
           filteredDevices: json,
           devices: json
-        })
-      );
-    fetch("http://localhost:3000/api/v1/colors")
+        });
+      });
+    fetch("http://localhost:3001/api/v1/colors")
       .then(resp => resp.json())
       .then(json =>
         this.setState(
           {
             colors: json,
-            selectedColors: json.map(color => color.name)
+            selectedColors: json
+              .filter(color => color.devices.length)
+              .map(color => color.name)
           },
           () => (this.selectedColors = this.state.selectedColors)
         )
       );
   }
 
+  fetchAll = () => {
+    fetch("http://localhost:3001/api/v1/devices/all")
+      .then(resp => resp.json())
+      .then(json => {
+        this.setState({
+          devices: json
+        });
+      });
+  };
+
   selectedDecades = [1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990];
 
   handleDecade = e => {
+    this.fetchAll();
     this.setState({ filteredDevices: [] });
     this.selectedDecades = [];
-    let decade = parseInt(e.target.innerText, 10);
+    let decade = parseInt(e.target.closest("span").innerText, 10);
     this.selectedDecades.includes(decade)
       ? this.selectedDecades.splice(this.selectedDecades.indexOf(decade), 1)
       : this.selectedDecades.push(decade);
@@ -66,37 +80,47 @@ class App extends React.Component {
     setTimeout(
       () =>
         this.setState({
+          filtered: true,
           decade: decade,
           type: null,
-          filteredDevices: deviceByDecade
+          selectedColors: this.state.colors
+            .filter(color => color.devices.length)
+            .map(color => color.name),
+          filteredDevices: this.shuffle(deviceByDecade)
         }),
       1
     );
   };
 
   handleColor = e => {
+    this.fetchAll();
     let circle = e.target.closest(".circular");
     circle.classList.toggle("active");
-    let color = e.target.style.backgroundColor;
+    let color = circle.children[0].style.backgroundColor;
     let ink = document.querySelector(".ink");
+    ink.classList.remove("animate");
     ink.style.backgroundColor = color;
-    ink.classList.add("animate");
-    setTimeout(() => ink.classList.remove("animate"), 1000);
+    ink.style.left = `${e.clientX / 2}px`;
+    ink.style.top = `-${e.clientY / 2}px`;
+    setTimeout(() => ink.classList.add("animate"), 1);
     this.selectedColors.includes(color)
       ? this.selectedColors.splice(this.selectedColors.indexOf(color), 1)
       : this.selectedColors.push(color);
 
     let deviceByColor = this.state.devices.filter(device =>
-      device.colors.find(color => this.selectedColors.includes(color.name))
+      device.colors.find(color =>
+        this.state.selectedColors.includes(color.name)
+      )
     );
 
     setTimeout(
       () =>
         this.setState({
+          filtered: true,
           decade: null,
           type: null,
           selectedColors: this.selectedColors,
-          filteredDevices: deviceByColor
+          filteredDevices: this.shuffle(deviceByColor)
         }),
       1
     );
@@ -113,9 +137,10 @@ class App extends React.Component {
   ];
 
   handleType = e => {
+    this.fetchAll();
     this.setState({ filteredDevices: [] });
     this.selectedTypes = [];
-    let type = e.target.innerText;
+    let type = e.target.closest("span").innerText;
     this.selectedTypes.includes(type)
       ? this.selectedTypes.splice(this.selectedTypes.indexOf(type), 1)
       : this.selectedTypes.push(type);
@@ -137,15 +162,18 @@ class App extends React.Component {
     setTimeout(
       () =>
         this.setState({
+          filtered: true,
           decade: null,
           type: type,
-          filteredDevices: deviceByType
+          selectedColors: this.state.colors.map(color => color.name),
+          filteredDevices: this.shuffle(deviceByType)
         }),
       1
     );
   };
 
   handleMenu = location => {
+    console.log(location);
     this.setState({ activeItem: location });
   };
 
@@ -167,7 +195,7 @@ class App extends React.Component {
 
   updateColor = (colors, id) => {
     let data = { colors: colors.join(","), id: id };
-    fetch(`http://localhost:3000/api/v1/devices/${id}`, {
+    fetch(`http://localhost:3001/api/v1/devices/${id}`, {
       body: JSON.stringify(data),
       headers: {
         Accept: "application/json",
@@ -178,20 +206,30 @@ class App extends React.Component {
     this.setState({ deviceColors: colors });
   };
 
-  render() {
-    const history = createHistory();
+  loadMore = () => {
+    this.toggleLoading();
+    fetch(`http://localhost:3001/api/v1/devices?load=${1 + this.state.page}`)
+      .then(resp => resp.json())
+      .then(json =>
+        this.setState({
+          filteredDevices: json,
+          devices: json,
+          loading: false,
+          page: 1 + this.state.page
+        })
+      );
+  };
 
+  toggleLoading = () => {
+    this.setState({
+      loading: true
+    });
+  };
+
+  render() {
     return (
       <div>
         <Router>
-          {/*  <TransitionGroup>
-            <CSSTransition
-              key={history.location.key}
-              classNames="fade"
-              timeout={10000}
-              transitionAppear={true}
-              transitionAppearTimeout={1000}
-            >*/}
           <Switch>
             <Route exact path="/">
               <ReactCSSTransitionGroup
@@ -220,8 +258,13 @@ class App extends React.Component {
                         />
                         <DeviceList
                           handleMenu={this.handleMenu}
-                          devices={this.shuffle(this.state.filteredDevices)}
+                          devices={this.state.filteredDevices}
                           detailView={this.detailView}
+                          loading={this.state.loading}
+                          loadMore={this.loadMore}
+                          toggleLoading={this.toggleLoading}
+                          page={this.state.page}
+                          filtered={this.state.filtered}
                         />
                       </div>
                     </Grid.Column>
@@ -248,8 +291,6 @@ class App extends React.Component {
             </Route>
             <Route path="*" render={() => "404 Not Found"} />
           </Switch>
-          {/*</CSSTransition>
-          </TransitionGroup>*/}
         </Router>
       </div>
     );

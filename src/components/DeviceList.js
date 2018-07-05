@@ -1,6 +1,7 @@
 import React from "react";
 import DeviceCard from "./DeviceCard";
 import { withRouter } from "react-router-dom";
+import Waypoint from "react-waypoint";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 
 class DeviceList extends React.Component {
@@ -12,8 +13,22 @@ class DeviceList extends React.Component {
     }, 1000);
   };
   componentDidMount() {
-    this.props.handleMenu("home");
+    // this.props.handleMenu("home");
   }
+
+  loadMore = () => {
+    this.props.loadMore();
+  };
+
+  renderWaypoint = () => {
+    if (
+      !this.props.filtered &&
+      !this.props.loading &&
+      this.props.devices.length >= this.props.page * 8
+    ) {
+      return <Waypoint onEnter={this.loadMore} threshold={0} />;
+    }
+  };
 
   render() {
     return (
@@ -21,7 +36,7 @@ class DeviceList extends React.Component {
         <ReactCSSTransitionGroup
           transitionName="fadeup"
           transitionEnterTimeout={600}
-          transitionLeaveTimeout={300}
+          transitionLeaveTimeout={600}
           transitionAppear={true}
           transitionAppearTimeout={600}
         >
@@ -34,6 +49,7 @@ class DeviceList extends React.Component {
               }}
             />
           ))}
+          {this.renderWaypoint()}
         </ReactCSSTransitionGroup>
       </section>
     );
