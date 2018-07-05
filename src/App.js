@@ -30,7 +30,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    fetch("http://electric-palettes-backend.herokuapp.com1/api/v1/devices")
+    fetch("http://electric-palettes-backend.herokuapp.com/api/v1/devices")
       .then(resp => resp.json())
       .then(json => {
         this.setState({
@@ -38,7 +38,7 @@ class App extends React.Component {
           devices: json
         });
       });
-    fetch("http://electric-palettes-backend.herokuapp.com1/api/v1/colors")
+    fetch("http://electric-palettes-backend.herokuapp.com/api/v1/colors")
       .then(resp => resp.json())
       .then(json =>
         this.setState(
@@ -54,7 +54,7 @@ class App extends React.Component {
   }
 
   fetchAll = () => {
-    fetch("http://electric-palettes-backend.herokuapp.com1/api/v1/devices/all")
+    fetch("http://electric-palettes-backend.herokuapp.com/api/v1/devices/all")
       .then(resp => resp.json())
       .then(json => {
         this.setState({
@@ -195,7 +195,7 @@ class App extends React.Component {
 
   updateColor = (colors, id) => {
     let data = { colors: colors.join(","), id: id };
-    fetch(`http://electric-palettes-backend.herokuapp.com1/api/v1/devices/${id}`, {
+    fetch(`http://electric-palettes-backend.herokuapp.com/api/v1/devices/${id}`, {
       body: JSON.stringify(data),
       headers: {
         Accept: "application/json",
@@ -208,7 +208,7 @@ class App extends React.Component {
 
   loadMore = () => {
     this.toggleLoading();
-    fetch(`http://electric-palettes-backend.herokuapp.com1/api/v1/devices?load=${1 + this.state.page}`)
+    fetch(`http://electric-palettes-backend.herokuapp.com/api/v1/devices?load=${1 + this.state.page}`)
       .then(resp => resp.json())
       .then(json =>
         this.setState({

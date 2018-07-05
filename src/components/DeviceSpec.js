@@ -16,7 +16,11 @@ class DeviceSpec extends React.Component {
   }
 
   componentDidMount() {
-    fetch(`http://electric-palettes-backend.herokuapp.com1/api/v1/devices/${this.state.id}`)
+    fetch(
+      `http://electric-palettes-backend.herokuapp.com/api/v1/devices/${
+        this.state.id
+      }`
+    )
       .then(resp => resp.json())
       .then(json => {
         this.setState({
