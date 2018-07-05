@@ -14,7 +14,7 @@ export default class DeviceCard extends React.Component {
     // const handleClick = e => {
     //   let id = e.target.dataset.id;
     //
-    //   fetch(`http://lelectric-palettes-backend.herokuapp.com0/api/v1/devices/${id}`, {
+    //   fetch(`http://electric-palettes-backend.herokuapp.com0/api/v1/devices/${id}`, {
     //     body: JSON.stringify(id),
     //     headers: {
     //       Accept: "application/json",
