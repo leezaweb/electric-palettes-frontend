@@ -92,7 +92,7 @@ class DeviceSpec extends React.Component {
                     circular
 
                   />*/}
-                <form onSubmit={this.handleSubmit}>
+                 {/*<form onSubmit={this.handleSubmit}>
                   <select name="colors" multiple onChange={this.handleChange}>
                     {this.props.colors.map(color => (
                       <option
@@ -111,7 +111,7 @@ class DeviceSpec extends React.Component {
                   </select>
                   <br />
                   <button>submit</button>
-                </form>
+                </form>*/}
                 <div className="ui internally celled grid">
                   <Grid.Row>
                     <Grid.Column width={6}>
